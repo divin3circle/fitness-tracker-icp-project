@@ -1,0 +1,21 @@
+type Exercise = record {
+  id : text;
+  date : nat64;
+  name : text;
+  durationMinutes : float64;
+  caloriesBurned : float64;
+};
+type ExercisePayload = record {
+  name : text;
+  durationMinutes : float64;
+  caloriesBurned : float64;
+};
+type _AzleResult = variant { Ok : Exercise; Err : text };
+type _AzleResult_1 = variant { Ok : vec Exercise; Err : text };
+service : {
+  addExercise : (ExercisePayload) -> (_AzleResult);
+  deleteExercise : (text) -> (_AzleResult);
+  getExercise : (text) -> (_AzleResult) query;
+  getExercises : () -> (_AzleResult_1) query;
+  updateExercise : (text, ExercisePayload) -> (_AzleResult);
+}

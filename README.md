@@ -14,6 +14,7 @@ This is a Fitness Tracker canister deployed on the Internet Computer network. It
 
 - [DFINITY SDK](https://sdk.dfinity.org/docs/quickstart/local-quickstart.html) installed.
 - Basic familiarity with the DFINITY Internet Computer.
+## IMPORTANT: In an update to fix recurring bugs, I renamed the project to the default tutorial canister "message_board"
 
 ## Deployment
 
