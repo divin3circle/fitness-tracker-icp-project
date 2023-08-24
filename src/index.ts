@@ -69,6 +69,7 @@ export function updateExercise(
   });
 }
 
+
 $update;
 export function deleteExercise(id: string): Result<Exercise, string> {
   return match(exerciseStorage.remove(id), {
