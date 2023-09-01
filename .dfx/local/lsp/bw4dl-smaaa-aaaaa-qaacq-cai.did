@@ -11,11 +11,13 @@ type ExercisePayload = record {
   caloriesBurned : float64;
 };
 type _AzleResult = variant { Ok : Exercise; Err : text };
-type _AzleResult_1 = variant { Ok : vec Exercise; Err : text };
+type _AzleResult_1 = variant { Ok : float64; Err : text };
+type _AzleResult_2 = variant { Ok : vec Exercise; Err : text };
 service : {
   addExercise : (ExercisePayload) -> (_AzleResult);
+  calculateTotalCaloriesBurned : () -> (_AzleResult_1) query;
   deleteExercise : (text) -> (_AzleResult);
   getExercise : (text) -> (_AzleResult) query;
-  getExercises : () -> (_AzleResult_1) query;
+  getExercises : () -> (_AzleResult_2) query;
   updateExercise : (text, ExercisePayload) -> (_AzleResult);
 }

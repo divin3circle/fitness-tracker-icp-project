@@ -1429,7 +1429,11 @@ var v4_default = v4;
 // src/index.ts
 var exerciseStorage = new StableBTreeMap(0, 44, 1024);
 function getExercises() {
-    return Result.Ok(exerciseStorage.values());
+    try {
+        return Result.Ok(exerciseStorage.values());
+    } catch (error) {
+        return Result.Err("Failed to fetch exercises");
+    }
 }
 exports.getExercises = getExercises;
 function getExercise(id) {
@@ -1441,18 +1445,34 @@ function getExercise(id) {
 }
 exports.getExercise = getExercise;
 function addExercise(payload) {
+    if (!payload.name || !payload.durationMinutes || !payload.caloriesBurned) {
+        return Result.Err("Invalid payload");
+    }
     const exercise = _objectSpread({
         id: v4_default(),
         date: ic.time()
     }, payload);
-    exerciseStorage.insert(exercise.id, exercise);
-    return Result.Ok(exercise);
+    try {
+        exerciseStorage.insert(exercise.id, exercise);
+        return Result.Ok(exercise);
+    } catch (error) {
+        return Result.Err("Failed to add exercise");
+    }
 }
 exports.addExercise = addExercise;
 function updateExercise(id, payload) {
+    if (!payload.name || !payload.durationMinutes || !payload.caloriesBurned) {
+        return Result.Err("Invalid payload");
+    }
     return match(exerciseStorage.get(id), {
         Some: (exercise)=>{
-            const updatedExercise = _objectSpread({}, exercise, payload);
+            const updatedExercise = {
+                id: exercise.id,
+                name: payload.name,
+                durationMinutes: payload.durationMinutes,
+                caloriesBurned: payload.caloriesBurned,
+                date: exercise.date
+            };
             exerciseStorage.insert(exercise.id, updatedExercise);
             return Result.Ok(updatedExercise);
         },
@@ -1461,15 +1481,22 @@ function updateExercise(id, payload) {
 }
 exports.updateExercise = updateExercise;
 function deleteExercise(id) {
-    return match(exerciseStorage.remove(id), {
-        Some: (deletedExercise)=>Result.Ok(deletedExercise)
-        ,
-        None: ()=>Result.Err(`Couldn't delete an exercise with id=${id}. Exercise not found.`)
-    });
+    try {
+        return match(exerciseStorage.remove(id), {
+            Some: (deletedExercise)=>Result.Ok(deletedExercise)
+            ,
+            None: ()=>Result.Err(`Couldn't delete an exercise with id=${id}. Exercise not found.`)
+        });
+    } catch (error) {
+        return Result.Err(`An unexpected error occurred: ${error}`);
+    }
 }
 exports.deleteExercise = deleteExercise;
 function calculateTotalCaloriesBurned() {
     const exercises = exerciseStorage.values();
+    if (exercises.length === 0) {
+        return Result.Err("No exercises found in storage");
+    }
     const totalCalories = exercises.reduce((total, exercise)=>total + exercise.caloriesBurned
     , 0);
     return Result.Ok(totalCalories);
